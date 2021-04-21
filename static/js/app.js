@@ -1,9 +1,46 @@
 console.log('loaded app.js');
 
 
+// ======================================================
+// TA Benji taught me a cool way to only call my data once
+//  by creating a function for it. 
+
+var getData = (() => {
+    var _state = 'no data';
+    var _data;
+    var _callbackQueue = [];
+    return function (callback) {
+        //first time called
+        switch (_state) {
+            case 'no data':
+                _callbackQueue.push(callback);
+                _state = 'waiting';
+
+                //handling what happens when data gets back
+                d3.json('samples.json').then(data => {
+                    for (var i = 0; i < _callbackQueue.length; i++)
+                        _callbackQueue[i](data);
+                    _state = 'complete';
+                    _data = data;
+                });
+                break;
+
+            //subsequent times, but data hasn't returned yet
+            case 'waiting':
+                _callbackQueue.push(callback);
+                break;
+
+            case 'complete':
+                callback(_data);
+                break;
+        }
+    }
+})();
+// =====================================================================
+
 // Function for plotting Bargraph
 function barGraph(patientId) {
-    d3.json('samples.json').then((importedData) => {
+    getData((importedData) => {
         // pulling out patient sample data
         samples = importedData.samples;
         sample = samples.filter(o => o.id === patientId);
@@ -24,18 +61,18 @@ function barGraph(patientId) {
 
 
         // This makes a String out of the number Otu for the ticks
-        var otuIdsSlice = otuIds.slice(0,10).reverse();
+        var otuIdsSlice = otuIds.slice(0, 10).reverse();
         var otuIdsSliceStr = [];
         // adding OTU to labels
-        for (i=0; i < otuIdsSlice.length; i++) {
+        for (i = 0; i < otuIdsSlice.length; i++) {
             otuIdsSliceStr[i] = `OTU ${otuIdsSlice[i]}`;
         }
 
         var traceBar = {
             // I want only the first tenn (top) and i them in descenting order
             y: otuIdsSliceStr,
-            x: sampleValues.slice(0,10).reverse(),
-            text: otuLabels.slice(0,10).reverse(),
+            x: sampleValues.slice(0, 10).reverse(),
+            text: otuLabels.slice(0, 10).reverse(),
             type: 'bar',
             orientation: 'h'
         };
@@ -52,7 +89,7 @@ function barGraph(patientId) {
 
 function bubbleGraph(patientId) {
     console.log(`Patient is ${patientId}`);
-    d3.json('samples.json').then((importedData) => {
+    getData((importedData) => {
         // pulling out patient sample data
         samples = importedData.samples;
         sample = samples.filter(o => o.id === patientId);
@@ -96,37 +133,37 @@ function demographicInfo(patientId) {
     // selecting panel to put demographic metadata in
     var demoPanel = d3.select('.panel-body');
 
-        d3.json('samples.json').then((importedData) => {
-            // pulling out patient sample data
-            metadatas = importedData.metadata;
-            // console.log(metadatas);
-            metadata = metadatas.filter(o => parseInt(o.id) === parseInt(patientId))[0];
-            // console.log(metadata);
-            
-            // string for putting into demographics table
-            var htmlString = '';
-            // iterating over key and value and printing out
-            Object.entries(metadata).forEach(([key, value]) => {
-                console.log(`${key}: ${value}`);
+    getData((importedData) => {
+        // pulling out patient sample data
+        metadatas = importedData.metadata;
+        // console.log(metadatas);
+        metadata = metadatas.filter(o => parseInt(o.id) === parseInt(patientId))[0];
+        // console.log(metadata);
 
-                // place holder string to put into htmlString
-                var string = `<p>${key}: ${value}</p>`;
-                
-                // combining into one long string to pass into demoPanel
-                htmlString = htmlString + string;
+        // string for putting into demographics table
+        var htmlString = '';
+        // iterating over key and value and printing out
+        Object.entries(metadata).forEach(([key, value]) => {
+            console.log(`${key}: ${value}`);
 
-            });
+            // place holder string to put into htmlString
+            var string = `<p>${key}: ${value}</p>`;
 
-            // putting demographic metadata into panel
-            demoPanel.html(htmlString);
-            
+            // combining into one long string to pass into demoPanel
+            htmlString = htmlString + string;
 
         });
+
+        // putting demographic metadata into panel
+        demoPanel.html(htmlString);
+
+
+    });
 }
 
 
 function gaugePlot(patientId) {
-    d3.json('samples.json').then((importedData) => {
+    getData((importedData) => {
         // pulling out patient sample data
         metadatas = importedData.metadata;
         metadata = metadatas.filter(o => parseInt(o.id) === parseInt(patientId))[0];
@@ -143,25 +180,25 @@ function gaugePlot(patientId) {
         var traceGauge = {
             domain: { x: [0, 1], y: [0, 1] },
             value: washFreq,
-            title: {text: 'Scrubs Per Week'},
+            title: { text: 'Scrubs Per Week' },
             type: 'indicator',
             mode: 'gauge+number',
             gauge: {
                 axis: { range: [0, 9] },
                 steps: [
-                    {range: [0,1], color: '#D1D8D7'},
-                    {range: [1,2], color: '#C6D4CB'},
-                    {range: [2,3], color: '#BBD0BE'},
-                    {range: [3,4], color: '#AFCCB2'},
-                    {range: [4,5], color: '#A4C8A5'},
-                    {range: [5,6], color: '#99C399'},
-                    {range: [6,7], color: '#8EBF8C'},
-                    {range: [7,8], color: '#82BB80'},
-                    {range: [8,9], color: '#77B773'}
+                    { range: [0, 1], color: '#D1D8D7' },
+                    { range: [1, 2], color: '#C6D4CB' },
+                    { range: [2, 3], color: '#BBD0BE' },
+                    { range: [3, 4], color: '#AFCCB2' },
+                    { range: [4, 5], color: '#A4C8A5' },
+                    { range: [5, 6], color: '#99C399' },
+                    { range: [6, 7], color: '#8EBF8C' },
+                    { range: [7, 8], color: '#82BB80' },
+                    { range: [8, 9], color: '#77B773' }
                 ]
             }
         };
-        
+
 
         var data = [traceGauge];
 
@@ -171,7 +208,7 @@ function gaugePlot(patientId) {
 
         Plotly.newPlot('gauge', data, layout);
 
-        
+
     });
 }
 
@@ -191,7 +228,7 @@ function init() {
 
     var selection = d3.select('#selDataset');
 
-    d3.json('samples.json').then((importedData) => {
+    getData((importedData) => {
         console.log(importedData);
 
         var patientNames = importedData.names;
@@ -199,17 +236,17 @@ function init() {
         // this part I got from Dom's talk on this homework
         patientNames.forEach(patient => {
             selection.append('option')
-            .text(patient)
-            .property('value', patient);
+                .text(patient)
+                .property('value', patient);
         });
 
-        
 
-        
-        
+
+
+
         // starting by plotting just patient zero
         console.log(importedData.names[0]);
-    
+
         // picking a patient to work with
         var patientZero = importedData.names[0];
 
