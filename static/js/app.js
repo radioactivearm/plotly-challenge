@@ -3,7 +3,7 @@ console.log('loaded app.js');
 
 // Function for plotting Bargraph
 function barGraph(patientId) {
-    d3.json('plotly-challenge/samples.json').then((importedData) => {
+    d3.json('samples.json').then((importedData) => {
         // pulling out patient sample data
         samples = importedData.samples;
         sample = samples.filter(o => o.id === patientId);
@@ -52,7 +52,7 @@ function barGraph(patientId) {
 
 function bubbleGraph(patientId) {
     console.log(`Patient is ${patientId}`);
-    d3.json('plotly-challenge/samples.json').then((importedData) => {
+    d3.json('samples.json').then((importedData) => {
         // pulling out patient sample data
         samples = importedData.samples;
         sample = samples.filter(o => o.id === patientId);
@@ -96,7 +96,7 @@ function demographicInfo(patientId) {
     // selecting panel to put demographic metadata in
     var demoPanel = d3.select('.panel-body');
 
-        d3.json('plotly-challenge/samples.json').then((importedData) => {
+        d3.json('samples.json').then((importedData) => {
             // pulling out patient sample data
             metadatas = importedData.metadata;
             // console.log(metadatas);
@@ -126,7 +126,7 @@ function demographicInfo(patientId) {
 
 
 function gaugePlot(patientId) {
-    d3.json('plotly-challenge/samples.json').then((importedData) => {
+    d3.json('samples.json').then((importedData) => {
         // pulling out patient sample data
         metadatas = importedData.metadata;
         metadata = metadatas.filter(o => parseInt(o.id) === parseInt(patientId))[0];
@@ -191,7 +191,7 @@ function init() {
 
     var selection = d3.select('#selDataset');
 
-    d3.json('plotly-challenge/samples.json').then((importedData) => {
+    d3.json('samples.json').then((importedData) => {
         console.log(importedData);
 
         var patientNames = importedData.names;
