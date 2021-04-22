@@ -3,7 +3,8 @@ console.log('loaded app.js');
 
 // ======================================================
 // TA Benji taught me a cool way to only call my data once
-//  by creating a function for it. 
+//  by creating a function for it. TA Benji did most of the writing
+// of this while teaching me how to do this.
 
 var getData = (() => {
     var _state = 'no data';
@@ -80,7 +81,7 @@ function barGraph(patientId) {
         var data = [traceBar];
 
         var layout = {
-            title: `Patient ${patientId}'s Belly Button Bacteria`
+            // title: `Patient ${patientId}'s Belly Button Bacteria`
         };
 
         Plotly.newPlot('bar', data, layout);
@@ -120,7 +121,7 @@ function bubbleGraph(patientId) {
         var data = [traceBubble];
 
         var layout = {
-            title: `Patient ${patientId}'s Bacteria Breakdown`
+            // title: `Patient ${patientId}'s Bacteria Breakdown`
         };
 
         Plotly.newPlot('bubble', data, layout);
@@ -180,7 +181,9 @@ function gaugePlot(patientId) {
         var traceGauge = {
             domain: { x: [0, 1], y: [0, 1] },
             value: washFreq,
-            title: { text: 'Scrubs Per Week' },
+            // where i got the code to make subtitle in text field
+            // https://plotly.com/javascript/indicator/
+            title: { text: "Belly Button Washing Frequency<br><span style='font-size:1em;color:gray'>Scrubs Per Week<span>" },
             type: 'indicator',
             mode: 'gauge+number',
             gauge: {
@@ -203,7 +206,7 @@ function gaugePlot(patientId) {
         var data = [traceGauge];
 
         var layout = {
-            title: 'Belly Button Washing Frequency'
+            // title: 'Belly Button Washing Frequency'
         };
 
         Plotly.newPlot('gauge', data, layout);
@@ -215,9 +218,12 @@ function gaugePlot(patientId) {
 
 
 // got help of this from dom's talk on homework
+// this is the event handler
 function optionChanged(patientId) {
     console.log(`Current Patient is ${patientId}`);
     // console.log('replot');
+
+    // these for lines remake the graphs for newly selected patient
     barGraph(patientId);
     bubbleGraph(patientId);
     demographicInfo(patientId);
@@ -234,6 +240,7 @@ function init() {
         var patientNames = importedData.names;
 
         // this part I got from Dom's talk on this homework
+        // this puts patient names in dropdown
         patientNames.forEach(patient => {
             selection.append('option')
                 .text(patient)
@@ -251,12 +258,11 @@ function init() {
         var patientZero = importedData.names[0];
 
         console.log('original plot');
+
+        // these for lines make the initial graphs
         barGraph(patientZero);
-
         bubbleGraph(patientZero);
-
         demographicInfo(patientZero);
-
         gaugePlot(patientZero);
 
 
@@ -264,10 +270,5 @@ function init() {
     });
 }
 
-
-
-
-
-
-
+// this calls the initial function
 init();
